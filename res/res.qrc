@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="images">
+    <file alias="warning">img/warning.png</file>
+    <file alias="minus">img/minus.png</file>
+    <file alias="plus">img/plus.png</file>
+    <file alias="minuspressed">img/minus_pressed.png</file>
+    <file alias="pluspressed">img/plus_pressed.png</file>
+    <file alias="arrowdownpressed">img/arrow_down_pressed.png</file>
+    <file alias="arrowuppressed">img/arrow_up_pressed.png</file>
+    <file alias="arrowup">img/arrow_up.png</file>
+    <file alias="arrowdown">img/arrow_down.png</file>
+    <file alias="icon">./img/Icon.jpg</file>
+    <file alias="background">./img/background.jpg</file>
+  </qresource>
+  <qresource prefix="text"/>
+</RCC>
