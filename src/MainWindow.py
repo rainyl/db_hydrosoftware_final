@@ -392,8 +392,8 @@ class MainWindow(UI_MainWindow):
 
     def show_table(self):
         matrix = self.worker.make_matrix()
-        headers = ['月份', "天然来水", "引用流量", "蓄/供流量", "蓄/供水量", "时段初水量",
-                   "时段均水量", "上游均水头", "下游均水头", "水头损失", "均水头", "出力系数", "出力"]
+        headers = ['月份', "天然来水(m^3/s)", "引用流量(m^3/s)", "蓄/供流量(m^3/s)", "蓄/供水量(亿m^3)", "时段初水量(亿m^3)",
+                   "时段均水量(亿m^3)", "上游均水头(m)", "下游均水头(m)", "水头损失(m)", "均水头(m)", "出力系数", "出力(万Kw)"]
         self.table_data.setRowCount(len(matrix))
         self.table_data.setColumnCount(len(headers))
         self.table_data.setHorizontalHeaderLabels(headers)
