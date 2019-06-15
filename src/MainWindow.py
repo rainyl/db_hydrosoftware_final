@@ -116,6 +116,7 @@ class MainWindow(UI_MainWindow):
                 ax.grid()
                 ax.legend()
                 self.canvas_zv.draw()
+                logging.info("Draw finish")
             else:
                 self.fig_zv.clear()
                 self.canvas_zv.draw()
@@ -196,6 +197,10 @@ class MainWindow(UI_MainWindow):
             self.canvas_zo.draw()
             self.fig_k.clf()
             self.canvas_k.draw()
+            self.fig_dh.clear()
+            self.canvas_dh.draw()
+            self.fig_n.clear()
+            self.canvas_n.draw()
             QMessageBox.warning(self, "提示", "未选择曲线！")
             return
         conn.close()
@@ -290,38 +295,38 @@ class MainWindow(UI_MainWindow):
                 QMessageBox.warning(self, "警告", "输入有误！")
                 return
         # 获取水位
-        # try:
-        #     Z_s, Z_d = int(self.ledt_nsl.text()), int(self.ledt_dsl.text())
-        # except Exception as e:
-        #     logging.error(e)
-        #     QMessageBox.warning(self, "警告", "水位输入错误")
-        #     return
-        z_s = 175
-        z_d = 145
+        try:
+            z_s, z_d = int(self.ledt_nsl.text()), int(self.ledt_dsl.text())
+        except Exception as e:
+            logging.error(e)
+            QMessageBox.warning(self, "警告", "水位输入错误")
+            return
+        # z_s = 175
+        # z_d = 145
         # 合成数据字典
-        # _data = self.make_data_dict()
-        _data = {
-            'year': 1883,
-            'xsq': {
-                7: 32705,
-                8: 30557,
-                9: 33819,
-                10: 31605
-            },
-            'gsq': {
-                1: 5280,
-                2: 4490,
-                3: 6967,
-                4: 8152
-            },
-            'bxbg': {
-                12: 8133,
-                5: 19827,
-                6: 26992,
-                11: 13990
-            }
-        }
+        # _data = {
+        #     'year': 1883,
+        #     'xsq': {
+        #         7: 32705,
+        #         8: 30557,
+        #         9: 33819,
+        #         10: 31605
+        #     },
+        #     'gsq': {
+        #         1: 5280,
+        #         2: 4490,
+        #         3: 6967,
+        #         4: 8152
+        #     },
+        #     'bxbg': {
+        #         12: 8133,
+        #         5: 19827,
+        #         6: 26992,
+        #         11: 13990
+        #     }
+        # }
 
+        _data = self.make_data_dict()
         self.worker = Worker(_data, error, z_s, z_d, zo, kh, zv, odh)
         self.worker.run(self._time)
         self.show_table()
@@ -343,24 +348,31 @@ class MainWindow(UI_MainWindow):
             logging.error(e)
             QMessageBox.warning(self, "警告", "输入有误！")
             return
-
+        n_pre = self.worker.N
+        n_nex = None
         if self.worker.over(self._time):
             self.worker.set_n(n)
             self.worker.run(self._time)
             if self.worker.over(self._time):
+                n_pre = n
                 logging.warning("输入过小，请增大N")
                 return
+            else:
+                n_nex = n
         else:
             self.worker.set_n(n)
             self.worker.run(self._time)
             if not self.worker.over(self._time):
+                n_nex = n
                 logging.warning("输入过大，请减小N")
                 return
+            else:
+                n_pre = n
 
         # 二分法逼近
-        n_pre = min(self.worker.N, n)
-        n_nex = max(self.worker.N, n)
-        # work_thread = MyThread(parent=self)
+        # n_pre = min(self.worker.N, n)
+        # n_nex = max(self.worker.N, n)
+        self.work_thread = MyThread(parent=self)
         self.work_thread.set_obj(self.worker, n_pre, n_nex, self._time)
         # 启动线程进行计算，防止阻塞主线程
         self.work_thread.start()
@@ -507,7 +519,7 @@ class MainWindow(UI_MainWindow):
         gsq = [int(i) for i in gsq.split(',')]
         xsq = [int(i) for i in xsq.split(',')]
         bxbg = np.array([i if i not in gsq and i not in xsq else -1 for i in range(1, 13)])
-        bxbg = bxbg[bxbg>0]
+        bxbg = bxbg[bxbg > 0]
 
         desq = self.ledt_desq.text()
         try:
@@ -540,10 +552,10 @@ class MainWindow(UI_MainWindow):
             _dict['gsq'][m] = data[_idx-1]
         for m in xsq:
             _idx = self.map[m]
-            _dict['xsq'] = data[_idx-1]
+            _dict['xsq'][m] = data[_idx-1]
         for m in bxbg:
             _idx = self.map[m]
-            _dict['bxbq'] = data[_idx - 1]
+            _dict['bxbg'][m] = data[_idx - 1]
         return _dict
 
 

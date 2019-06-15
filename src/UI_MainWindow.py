@@ -17,8 +17,6 @@ from matplotlib.figure import Figure
 from src.SSSetter import *
 import res.res
 import src.qss
-import time
-import threading
 import logging
 from src.Namer import Namer
 
@@ -288,7 +286,6 @@ class UI_MainWindow(QMainWindow):
         grpbox_log = QGroupBox(self._tr("Log", "日志"))
         grpbox_log.setLayout(layout_log)
 
-
         # spliter_left = QSplitter(Qt.Vertical)
         # spliter_left.addWidget(grpbox_args)
         # spliter_left.addWidget(grpbox_flood_cls)
@@ -333,7 +330,6 @@ class UI_MainWindow(QMainWindow):
         self.tab_fig.addTab(self.canvas_dh, self._tr("dh", "水头损失"))
         self.tab_fig.addTab(self.canvas_n, self._tr("n", "出力过程"))
 
-
         spliter_mid = QSplitter(Qt.Vertical)
         spliter_mid.addWidget(self.table_data)
         spliter_mid.addWidget(self.tab_fig)
@@ -374,7 +370,6 @@ class UI_MainWindow(QMainWindow):
         self.lbl_K.setText(_tr("K", "出力系数K"))
         self.lbl_error.setText(_tr("error", "计算精度"))
 
-        # self.rdo_btn.setText(_tr("design flood", "设计洪水"))
         self.lbl_ddy.setText(_tr("design dry year", "设计枯水年"))
         self.lbl_ddym.setText(_tr("water year", "水文年起止"))
 
@@ -386,22 +381,3 @@ class UI_MainWindow(QMainWindow):
         self.copyright.setText(
             "<a href='https://github.com/rainyl'>©2019 Rainyl's Team All Rights Reserved " + "</a>" + current_time.toString(
                 " hh:mm:ss"))
-
-
-class MyThread(threading.Thread):
-    end = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.lock = threading.Lock()
-        self.result = None
-        self.end.connect(self._end())
-
-    def run(self):
-        logging.info("线程Worker run启动")
-        with self.lock:
-            time.sleep(10)
-        # return result
-
-    def _end(self):
-        pass
