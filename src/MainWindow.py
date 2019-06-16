@@ -13,10 +13,13 @@ from src.Worker import Worker
 from src.Namer import Namer
 from src.P3.Flood import Flood
 from src.ploter import Ploter
+from src.Ui_HelpWindow import Ui_HelpWindow
 import logging
 import sqlite3
 import sys
 import time
+import os
+import platform
 import subprocess
 
 
@@ -27,6 +30,7 @@ class MainWindow(UI_MainWindow):
         self._tr = QCoreApplication.translate
 
         self.db = None
+        self.helpwindow = Ui_HelpWindow()
         self._time = 'gsq'
         self.worker = None
         self.work_thread = MyThread(parent=self)
@@ -53,6 +57,7 @@ class MainWindow(UI_MainWindow):
     def slots(self):
         self.action_open_db.triggered.connect(self.on_action_triggered)
         self.action_exit.triggered.connect(self.on_action_triggered)
+        self.action_manul.triggered.connect(lambda: self.helpwindow.show())
         self.action_lyl.triggered.connect(self.on_action_triggered)
         self.action_brb.triggered.connect(self.on_action_triggered)
         self.action_hjy.triggered.connect(self.on_action_triggered)
@@ -66,6 +71,9 @@ class MainWindow(UI_MainWindow):
 
     def on_action_triggered(self):
         sender = self.sender()
+        system = platform.system()
+        spliter = '\\' if system == 'Windows' else '/'
+        back = '.exe' if system == 'Windows' else '.run'
         if sender.objectName() == Namer.action_open_db:
             db_path = QFileDialog.getOpenFileName(self,
                                                   self._tr("database", "选择数据库"),
@@ -84,12 +92,15 @@ class MainWindow(UI_MainWindow):
         elif sender.objectName() == Namer.action_lyl:
             # output = None
             # print(output)
-            output = subprocess.getoutput('.\\lyl.exe')
+            output = subprocess.getoutput(os.path.abspath('.')+spliter+'lyl'+back)
+            logging.info(output)
             # print(output)
         elif sender.objectName() == Namer.action_brb:
-            pass
+            output = subprocess.getoutput(os.path.abspath('.')+spliter+'brb'+back)
+            logging.info(output)
         elif sender.objectName() == Namer.action_hjy:
-            pass
+            output = subprocess.getoutput(os.path.abspath('.')+spliter+'hjy'+back)
+            logging.info(output)
         else:
             logging.warning("No such object")
 
